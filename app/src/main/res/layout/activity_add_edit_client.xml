@@ -33,6 +33,10 @@
                 android:inputType="textPersonName"
                 android:background="@drawable/bg_input" />
 
+            <TextView
+                android:id="@+id/firstNameError"
+                style="@style/FieldErrorText" />
+
             <EditText
                 android:id="@+id/lastNameInput"
                 android:layout_width="match_parent"
@@ -42,6 +46,10 @@
                 android:inputType="textPersonName"
                 android:background="@drawable/bg_input" />
 
+            <TextView
+                android:id="@+id/lastNameError"
+                style="@style/FieldErrorText" />
+
             <EditText
                 android:id="@+id/phoneInput"
                 android:layout_width="match_parent"
@@ -50,6 +58,10 @@
                 android:hint="Phone number"
                 android:inputType="phone"
                 android:background="@drawable/bg_input" />
+
+            <TextView
+                android:id="@+id/phoneError"
+                style="@style/FieldErrorText" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -67,6 +79,10 @@
                 android:hint="Street address (example: 100 Pennsylvania Ave)"
                 android:background="@drawable/bg_input" />
 
+            <TextView
+                android:id="@+id/streetError"
+                style="@style/FieldErrorText" />
+
             <EditText
                 android:id="@+id/aptInput"
                 android:layout_width="match_parent"
@@ -82,6 +98,10 @@
                 android:layout_marginTop="10dp"
                 android:hint="City"
                 android:background="@drawable/bg_input" />
+
+            <TextView
+                android:id="@+id/cityError"
+                style="@style/FieldErrorText" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -113,6 +133,10 @@
                     android:maxLength="10"
                     android:background="@drawable/bg_input" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/zipError"
+                style="@style/FieldErrorText" />
 
             <TextView
                 android:layout_width="wrap_content"

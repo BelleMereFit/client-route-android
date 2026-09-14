@@ -24,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements ClientAdapter.Act
     private EditText searchInput;
     private View emptyState;
     private RecyclerView recyclerView;
+    private View nextVisitBanner;
+    private TextView nextVisitText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements ClientAdapter.Act
         recyclerView = findViewById(R.id.recyclerView);
         searchInput = findViewById(R.id.searchInput);
         emptyState = findViewById(R.id.emptyState);
+        nextVisitBanner = findViewById(R.id.nextVisitBanner);
+        nextVisitText = findViewById(R.id.nextVisitText);
 
         adapter = new ClientAdapter(visibleClients, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -68,7 +74,50 @@ public class MainActivity extends AppCompatActivity implements ClientAdapter.Act
         super.onResume();
         allClients.clear();
         allClients.addAll(ClientStorage.load(this));
+        sortByVisitTime();
+        updateNextVisitBanner();
         applyFilter(searchInput.getText().toString());
+    }
+
+    // Orders the list to match the day's route: earliest start time first,
+    // clients with no time set are moved to the end.
+    private void sortByVisitTime() {
+        Collections.sort(allClients, (a, b) -> {
+            int ta = a.startHour24 < 0 ? Integer.MAX_VALUE : a.startHour24 * 60 + a.startMinute;
+            int tb = b.startHour24 < 0 ? Integer.MAX_VALUE : b.startHour24 * 60 + b.startMinute;
+            return Integer.compare(ta, tb);
+        });
+    }
+
+    // Shows a banner for the next upcoming visit based on the current time of day.
+    private void updateNextVisitBanner() {
+        Calendar now = Calendar.getInstance();
+        int nowMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+
+        Client next = null;
+        int bestDiff = Integer.MAX_VALUE;
+        boolean anyScheduled = false;
+        for (Client c : allClients) {
+            if (c.startHour24 < 0) continue;
+            anyScheduled = true;
+            int startMinutes = c.startHour24 * 60 + c.startMinute;
+            int diff = startMinutes - nowMinutes;
+            if (diff >= 0 && diff < bestDiff) {
+                bestDiff = diff;
+                next = c;
+            }
+        }
+
+        if (next != null) {
+            nextVisitBanner.setVisibility(View.VISIBLE);
+            nextVisitText.setText("Next visit today: " + next.getFullName() + " at "
+                    + Client.formatTime(next.startHour24, next.startMinute));
+        } else if (anyScheduled) {
+            nextVisitBanner.setVisibility(View.VISIBLE);
+            nextVisitText.setText("All of today's scheduled visits are complete.");
+        } else {
+            nextVisitBanner.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -165,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements ClientAdapter.Act
                         }
                     }
                     ClientStorage.save(this, allClients);
+                    updateNextVisitBanner();
                     applyFilter(searchInput.getText().toString());
                     Toast.makeText(this, "Client deleted.", Toast.LENGTH_SHORT).show();
                 })

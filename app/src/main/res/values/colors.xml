@@ -10,4 +10,6 @@
     <color name="colorCall">#2563EB</color>
     <color name="colorEdit">#475569</color>
     <color name="colorDelete">#DC2626</color>
+    <color name="bannerBg">#E6F4F1</color>
+    <color name="bannerText">#0B5D57</color>
 </resources>

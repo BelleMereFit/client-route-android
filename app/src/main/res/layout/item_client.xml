@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="12dp"
-        android:weightSum="4">
+        android:weightSum="2">
 
         <Button
             android:id="@+id/directionsButton"
@@ -52,8 +52,11 @@
             android:layout_marginEnd="4dp"
             android:text="Directions"
             android:textAllCaps="false"
-            android:textSize="11sp"
-            android:padding="6dp"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:padding="8dp"
+            android:drawableStart="@drawable/ic_directions"
+            android:drawablePadding="6dp"
             android:backgroundTint="@color/colorPrimary"
             android:textColor="@android:color/white" />
 
@@ -62,13 +65,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
             android:text="Call"
             android:textAllCaps="false"
-            android:textSize="11sp"
-            android:padding="6dp"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:padding="8dp"
+            android:drawableStart="@drawable/ic_call"
+            android:drawablePadding="6dp"
             android:backgroundTint="@color/colorCall"
             android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:weightSum="2">
 
         <Button
             android:id="@+id/editButton"
@@ -78,8 +92,11 @@
             android:layout_marginEnd="4dp"
             android:text="Edit"
             android:textAllCaps="false"
-            android:textSize="11sp"
-            android:padding="6dp"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:padding="8dp"
+            android:drawableStart="@drawable/ic_edit"
+            android:drawablePadding="6dp"
             android:backgroundTint="@color/colorEdit"
             android:textColor="@android:color/white" />
 
@@ -88,10 +105,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="4dp"
             android:text="Delete"
             android:textAllCaps="false"
-            android:textSize="11sp"
-            android:padding="6dp"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:padding="8dp"
+            android:drawableStart="@drawable/ic_delete"
+            android:drawablePadding="6dp"
             android:backgroundTint="@color/colorDelete"
             android:textColor="@android:color/white" />
     </LinearLayout>
