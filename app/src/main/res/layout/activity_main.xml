@@ -1,26 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/bg">
-    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/surface" app:title="Client Route" app:titleTextColor="@color/textMain" />
-    <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent" android:padding="12dp">
-        <LinearLayout android:id="@+id/listContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
-            <Button android:id="@+id/addButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add Client" android:textAllCaps="false" android:backgroundTint="@color/colorPrimary" android:textColor="@android:color/white" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Tap a client to get directions, edit, or delete." android:textColor="@color/textMuted" />
-            <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:paddingTop="12dp" android:clipToPadding="false" />
-        </LinearLayout>
-        <ScrollView android:id="@+id/formContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_card" android:padding="16dp">
-                <TextView android:id="@+id/formTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add Client" android:textSize="22sp" android:textStyle="bold" android:textColor="@color/textMain" />
-                <EditText android:id="@+id/firstNameInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="First name" android:background="@drawable/bg_input" />
-                <EditText android:id="@+id/lastNameInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="Last name" android:background="@drawable/bg_input" />
-                <EditText android:id="@+id/phoneInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="Phone number" android:inputType="phone" android:background="@drawable/bg_input" />
-                <EditText android:id="@+id/addressInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="Physical address" android:minLines="3" android:gravity="top" android:background="@drawable/bg_input" />
-                <EditText android:id="@+id/startInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="Start time (example 08:00 AM)" android:background="@drawable/bg_input" />
-                <EditText android:id="@+id/endInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="End time (example 10:30 AM)" android:background="@drawable/bg_input" />
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="16dp">
-                    <Button android:id="@+id/saveButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Save Client" android:textAllCaps="false" android:backgroundTint="@color/colorPrimary" android:textColor="@android:color/white" />
-                    <Button android:id="@+id/cancelButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:text="Back" android:textAllCaps="false" />
-                </LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        app:title="Client Route"
+        app:titleTextColor="@color/textMain" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/addButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Client"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@android:color/white" />
+
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Search by name, phone, city, or address"
+            android:inputType="text"
+            android:maxLines="1"
+            android:background="@drawable/bg_input" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="12dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false" />
+
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/emptyStateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/textMuted"
+                    android:textSize="16sp"
+                    android:text="No clients yet. Tap Add Client to create your first one." />
             </LinearLayout>
-        </ScrollView>
-    </FrameLayout>
+        </FrameLayout>
+    </LinearLayout>
 </LinearLayout>

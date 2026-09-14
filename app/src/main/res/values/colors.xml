@@ -7,4 +7,7 @@
     <color name="textMain">#16212C</color>
     <color name="textMuted">#5E6A76</color>
     <color name="line">#D7DEE5</color>
+    <color name="colorCall">#2563EB</color>
+    <color name="colorEdit">#475569</color>
+    <color name="colorDelete">#DC2626</color>
 </resources>
