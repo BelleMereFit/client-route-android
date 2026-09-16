@@ -21,9 +21,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Install Android build packages
-        run: yes | sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+        with:
+          packages: 'platform-tools platforms;android-30 build-tools;30.0.3'
+          log-accepted-android-sdk-licenses: false
 
       - name: Install Gradle 7.2
         uses: gradle/actions/setup-gradle@v4
