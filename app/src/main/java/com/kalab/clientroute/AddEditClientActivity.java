@@ -61,6 +61,9 @@ public class AddEditClientActivity extends AppCompatActivity {
         zipInput = findViewById(R.id.zipInput);
         startTimeButton = findViewById(R.id.startTimeButton);
         endTimeButton = findViewById(R.id.endTimeButton);
+        startTimeButton.setVisibility(View.GONE);
+        endTimeButton.setVisibility(View.GONE);
+        phoneInput.setHint("Phone number (optional)");
 
         firstNameError = findViewById(R.id.firstNameError);
         lastNameError = findViewById(R.id.lastNameError);
@@ -165,7 +168,7 @@ public class AddEditClientActivity extends AppCompatActivity {
                 value.isEmpty() ? "Last name is required." : null);
 
         bindValidator(phoneInput, phoneError, value ->
-                value.replaceAll("[^0-9]", "").length() < 10 ? "Enter a complete 10-digit phone number." : null);
+                !value.isEmpty() && value.replaceAll("[^0-9]", "").length() < 10 ? "Enter a complete 10-digit phone number." : null);
 
         bindValidator(streetInput, streetError, value ->
                 value.isEmpty() ? "Street address is required." : null);
@@ -174,7 +177,7 @@ public class AddEditClientActivity extends AppCompatActivity {
                 value.isEmpty() ? "City is required." : null);
 
         bindValidator(zipInput, zipError, value ->
-                value.matches("\\d{5}(-\\d{4})?") ? null : "Enter a valid ZIP code (12345 or 12345-6789).");
+                value.isEmpty() || value.matches("\\d{5}(-\\d{4})?") ? null : "Enter a valid ZIP code (12345 or 12345-6789).");
     }
 
     private void bindValidator(EditText field, TextView errorView, FieldValidator validator) {
@@ -280,11 +283,11 @@ public class AddEditClientActivity extends AppCompatActivity {
 
         check(firstNameInput, firstNameError, first.isEmpty() ? "First name is required." : null);
         check(lastNameInput, lastNameError, last.isEmpty() ? "Last name is required." : null);
-        check(phoneInput, phoneError, phone.replaceAll("[^0-9]", "").length() < 10
+        check(phoneInput, phoneError, !phone.isEmpty() && phone.replaceAll("[^0-9]", "").length() < 10
                 ? "Enter a complete 10-digit phone number." : null);
         check(streetInput, streetError, street.isEmpty() ? "Street address is required." : null);
         check(cityInput, cityError, city.isEmpty() ? "City is required." : null);
-        check(zipInput, zipError, zip.matches("\\d{5}(-\\d{4})?") ? null
+        check(zipInput, zipError, zip.isEmpty() || zip.matches("\\d{5}(-\\d{4})?") ? null
                 : "Enter a valid ZIP code (12345 or 12345-6789).");
 
         if (!formValid) {

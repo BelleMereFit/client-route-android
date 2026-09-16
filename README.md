@@ -1,28 +1,32 @@
-# Client Route
+# Client Route Field
 
-A local-only Android tablet app for managing client addresses and visit times, then opening driving directions in Google Maps.
+Version 2.0 is a local-workflow Android test build for a shared field-service tablet. See [FIELD-RELEASE-NOTES.md](FIELD-RELEASE-NOTES.md) for features, installation, limitations and testing steps.
 
-## Included features
+## Download
 
-- First and last name, phone number, physical address, start time, and end time.
-- Native client list with a simple tablet-friendly UI.
-- Tap a client to open directions, edit the record, or delete the record.
-- Local-only data storage using SharedPreferences. Client data is not sent to a server.
-- Android 6.0.1 and later support (`minSdkVersion 23`).
+Use **Client-Route-Field-2.0.apk** in this repository for the delivered build. The older root `app-debug.apk` belongs to the previous Client Route version.
 
-## Get the installable APK
+The new APK installs separately as **Client Route Field** and does not copy the original app's records. Keep the original app installed. Do not clear its data.
 
-1. Open the **Actions** tab in GitHub.
-2. Select the latest **Build Android APK** run.
-3. Open the completed run and download the **Client-Route-debug-APK** artifact.
-4. Extract `app-debug.apk` if GitHub downloaded it as a ZIP file.
-5. Transfer the APK to the Android tablet, open it, and allow installation from the source when Android asks.
-6. Open **Client Route** and allow location access. Google Maps should be installed for the best directions experience.
+GitHub Actions also builds a `Client-Route-Field-debug-APK` artifact. Those debug builds can use different signing certificates from the delivered APK; do not uninstall a populated app to work around an update rejection.
 
-## Build locally
+## What works in this build
 
-Open this project in Android Studio and run **Build > Build APK(s)**. The debug APK will be at `app/build/outputs/apk/debug/app-debug.apk`.
+Today route, start/navigation timer, optional arrival marker, finish-job history, persistent client flags, per-job notes and crew roles, local issue photos, rolling reports, and ZIP backup export. Clients are added manually to today's route.
 
-## Important note
+## Not complete
 
-The debug APK is installable but is not Play Store signed. It is appropriate for direct installation onto your own tablet.
+**Automatic email import and Excel schedule parsing are not implemented or connected.** The receiving mailbox and original `.xlsx` workbook are needed to complete that integration. Original-app data migration, permanent production signing and in-app backup restore are also outstanding.
+
+## Verification
+
+- APK compiled successfully with JDK 17 and Gradle 7.2.
+- Android lint completed with zero errors; non-blocking warnings remain.
+- Installed and launched on an Android API 23 emulator at 600×960.
+- Two instrumentation tests passed: job/profile persistence and optional client fields/main-screen creation.
+- Today dashboard screenshot visually inspected.
+- Real-device GPS, camera capture, photo viewer and backup-provider behavior still require testing.
+
+## Build
+
+Run `gradle assembleDebug lintDebug` with JDK 17, Gradle 7.2, Android platform 30 and build-tools 30.0.3. Minimum supported API is 23. Device tests use `gradle connectedDebugAndroidTest`.
