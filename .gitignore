@@ -4,3 +4,5 @@
 *.iml
 /build/
 /app/build/
+# Private customer fixture used only for local instrumentation testing.
+/app/src/androidTest/assets/schedule-fixture.pdf

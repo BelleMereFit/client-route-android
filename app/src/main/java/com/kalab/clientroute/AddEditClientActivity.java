@@ -110,7 +110,7 @@ public class AddEditClientActivity extends AppCompatActivity {
     }
 
     private void selectStateInSpinner(String abbreviation) {
-        if (abbreviation == null) abbreviation = DEFAULT_STATE;
+        if (abbreviation == null || abbreviation.trim().isEmpty()) abbreviation = DEFAULT_STATE;
         String[] states = getResources().getStringArray(R.array.us_states);
         int index = 0;
         for (int i = 0; i < states.length; i++) {

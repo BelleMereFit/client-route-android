@@ -22,6 +22,7 @@ public class FieldActivity extends Activity {
     FieldStore store;
     LinearLayout page,body;
     String screen="Today", selectedClient="", pendingJob="", pendingPhoto="";
+    String routeDate="";
     int reportDays=1;
     Handler handler=new Handler();
     TextView clock;
@@ -34,15 +35,19 @@ public class FieldActivity extends Activity {
     void safe(Work w){try{w.run();}catch(Exception e){new AlertDialog.Builder(this).setTitle("Action not completed").setMessage(e.getMessage()).setPositiveButton("OK",null).show();}}
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
+        routeDate=getIntent().getStringExtra("routeDate");
+        if(routeDate==null)routeDate=day(System.currentTimeMillis());
+        if(b!=null)routeDate=b.getString("routeDate",routeDate);
         if(b!=null){pendingJob=b.getString("pendingJob","");pendingPhoto=b.getString("pendingPhoto","");screen=b.getString("screen","Today");selectedClient=b.getString("client","");}
         try{store=new FieldStore(this);}catch(Exception e){
             new AlertDialog.Builder(this).setMessage("Saved job data could not be read. Do not uninstall or clear app data.").setPositiveButton("Close",(d,w)->finish()).show();return;
         }
         render();handler.post(tick);
     }
-    @Override protected void onResume(){super.onResume();if(store!=null)render();}
+    @Override protected void onResume(){super.onResume();if(store!=null)safe(()->{store=new FieldStore(this);render();});}
     @Override protected void onDestroy(){handler.removeCallbacks(tick);super.onDestroy();}
     @Override protected void onSaveInstanceState(Bundle b){
+        b.putString("routeDate",routeDate);
         b.putString("pendingJob",pendingJob);b.putString("pendingPhoto",pendingPhoto);b.putString("screen",screen);b.putString("client",selectedClient);super.onSaveInstanceState(b);
     }
     int dp(int n){return (int)(getResources().getDisplayMetrics().density*n);}
@@ -66,7 +71,7 @@ public class FieldActivity extends Activity {
         LinearLayout nav=new LinearLayout(this);page.addView(nav);
         for(String tab:new String[]{"Today","Clients","Reports","Setup"}){
             Button b=new Button(this);b.setText(tab);b.setAllCaps(false);b.setTextSize(13);nav.addView(b,new LinearLayout.LayoutParams(0,dp(52),1));
-            b.setOnClickListener(v->{screen=tab;selectedClient="";render();});
+            b.setOnClickListener(v->{screen=tab;selectedClient="";if(tab.equals("Today"))routeDate=day(System.currentTimeMillis());render();});
         }
         ScrollView scroll=new ScrollView(this);page.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));body=column();scroll.addView(body);
         safe(()->{if(screen.equals("Today"))today();else if(screen.equals("Clients"))clients("");else if(screen.equals("Profile"))profile();else if(screen.equals("Reports"))reports();else setup();});
@@ -79,6 +84,12 @@ public class FieldActivity extends Activity {
     void today() throws Exception{
         text(body,new SimpleDateFormat("EEEE, MMMM d",Locale.US).format(new Date()),18);
         text(body,"Set up while parked. Start navigation before driving.",14);
+        button(body,"Import schedule PDF",()->startActivity(new Intent(this,ScheduleImportActivity.class)));
+        button(body,"Route date: "+routeDate+" (change)",()->{
+            String[] p=routeDate.split("-");
+            new DatePickerDialog(this,(view,y,m,d)->{routeDate=String.format(Locale.US,"%04d-%02d-%02d",y,m+1,d);render();},
+                Integer.parseInt(p[0]),Integer.parseInt(p[1])-1,Integer.parseInt(p[2])).show();
+        });
         JSONObject active=store.active();
         if(active!=null){
             LinearLayout c=card();text(c,"ACTIVE JOB",14);text(c,name(active),26);
@@ -97,7 +108,7 @@ public class FieldActivity extends Activity {
         int count=0;
         for(int i=0;i<store.jobs().length();i++){
             JSONObject j=store.jobs().getJSONObject(i);
-            if(!j.optString("scheduled").equals(day(System.currentTimeMillis())) || j.optLong("start")>0)continue;
+            if(!j.optString("scheduled").equals(routeDate) || j.optLong("start")>0)continue;
             count++;LinearLayout c=card();text(c,name(j),24);text(c,j.optString("address"),18);
             String f=store.profile(j.optString("client")).optString("flags");if(!f.isEmpty())text(c,"Access / flags: "+f,18);
             if(!j.optString("notes").isEmpty())text(c,j.optString("notes"),16);
@@ -106,8 +117,8 @@ public class FieldActivity extends Activity {
             button(c,"Remove from today",()->new AlertDialog.Builder(this).setMessage("Remove this unstarted job? Client history is kept.").setNegativeButton("Cancel",null)
                 .setPositiveButton("Remove",(d,w)->safe(()->{removeJob(j.optString("id"));store.save();render();})).show());
         }
-        if(count==0 && active==null)text(body,"No jobs waiting. Add a client to today's route to get started.",20);
-        button(body,"Add client to today's route",()->{screen="Clients";render();});
+        if(count==0 && active==null)text(body,"No jobs waiting for "+routeDate+". Import a PDF or add a client to the route.",20);
+        button(body,"Add client to route",()->{screen="Clients";render();});
     }
     void removeJob(String id)throws Exception{
         JSONArray a=new JSONArray();for(int i=0;i<store.jobs().length();i++)if(!store.jobs().getJSONObject(i).optString("id").equals(id))a.put(store.jobs().get(i));store.data.put("jobs",a);
@@ -144,13 +155,13 @@ public class FieldActivity extends Activity {
         text(body,c.getFullName(),26);text(body,c.getFullAddress(),18);
         JSONObject p=store.profile(c.id);text(body,"Access / flags: "+p.optString("flags","None"),18);
         text(body,"Client notes: "+p.optString("notes","None"),16);
-        button(body,"Add to today's route",()->{
+        button(body,"Add to route: "+routeDate,()->{
             for(int i=0;i<store.jobs().length();i++){
                 JSONObject existing=store.jobs().getJSONObject(i);
-                if(existing.optString("client").equals(c.id)&&existing.optString("scheduled").equals(day(System.currentTimeMillis()))&&existing.optLong("end")==0)
-                    throw new Exception("This client already has an unfinished job today.");
+                if(existing.optString("client").equals(c.id)&&existing.optString("scheduled").equals(routeDate)&&existing.optLong("end")==0)
+                    throw new Exception("This client already has an unfinished job on this date.");
             }
-            JSONObject j=new JSONObject();j.put("id",UUID.randomUUID().toString());j.put("client",c.id);j.put("name",c.getFullName());j.put("address",c.getFullAddress());j.put("scheduled",day(System.currentTimeMillis()));
+            JSONObject j=new JSONObject();j.put("id",UUID.randomUUID().toString());j.put("client",c.id);j.put("name",c.getFullName());j.put("address",c.getFullAddress());j.put("scheduled",routeDate);
             j.put("crew",store.data.optString("crew"));j.put("photos",new JSONArray());store.jobs().put(j);store.save();screen="Today";render();
         });
         button(body,"Edit contact information",()->startActivity(new Intent(this,AddEditClientActivity.class).putExtra(AddEditClientActivity.EXTRA_CLIENT_ID,c.id)));
@@ -236,13 +247,15 @@ public class FieldActivity extends Activity {
         text(body,"Default crew",24);text(body,"Set once, then copied into each new job. Change individual jobs when workers or roles differ.",16);
         EditText crew=input(body,"One worker and role per line",store.data.optString("crew"));
         button(body,"Save default crew",()->{store.data.put("crew",crew.getText().toString());store.save();Toast.makeText(this,"Crew saved",Toast.LENGTH_SHORT).show();});
-        text(body,"Schedule email • Not connected",24);
-        text(body,"Automatic import needs the receiving mailbox and original Excel workbook. No inbox is connected in this build. Add today's jobs from Clients for now.",16);
+        text(body,"Schedule import",24);
+        text(body,"Intended inbox: rebeccafay1992@gmail.com\nOpen or share the schedule PDF from Gmail or Files into Client Route Field. Review the crew, date and stops, then import. PDF processing stays on this tablet.",16);
+        button(body,"Import schedule PDF",()->startActivity(new Intent(this,ScheduleImportActivity.class)));
+        text(body,"Automatic email retrieval is not connected. Rebecca must authorize access before unattended inbox import can be added. Excel files and scanned/image-only PDFs are not supported by this importer.",16);
         text(body,"Local storage & backup",24);text(body,"Clients, gate codes, job records and photos stay on this tablet. Uninstalling or clearing storage deletes them. Export regularly and keep the backup private.",16);
         button(body,"Export backup ZIP (includes photos)",()->{
             Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);i.setType("application/zip");i.addCategory(Intent.CATEGORY_OPENABLE);i.putExtra(Intent.EXTRA_TITLE,"Client-Route-"+day(System.currentTimeMillis())+".zip");startActivityForResult(i,42);
         });
-        text(body,"Version 2.0 • Android 6.0.1+\nThis side-by-side build has separate storage from the original Client Route app. Existing records are not automatically copied.\nBackup contains JSON records and original photos. In-app restore is not included.",14);
+        text(body,"Version 2.1 • Android 6.0.1+\nThis side-by-side build has separate storage from the original Client Route app. Existing records are not automatically copied.\nBackup contains JSON records and original photos. In-app restore is not included.",14);
     }
     void export(Uri uri)throws Exception{
         try(OutputStream out=getContentResolver().openOutputStream(uri);ZipOutputStream zip=new ZipOutputStream(out)){
